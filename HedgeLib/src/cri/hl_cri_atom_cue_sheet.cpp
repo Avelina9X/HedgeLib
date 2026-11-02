@@ -341,10 +341,10 @@ static void write_global_aisac_reference_table_(
     const rad::vector<rad::string>& globalAisacNames)
 {
     utf::serializer sr(*wp.stream, *wp.allocator);
-
+    hl::cri::utf::column_info info[] = { {utf::cell_type::string, "Name"} };
     sr.start(
         "GlobalAisacReference",
-        { { utf::cell_type::string, "Name" } },
+        info,
         wp.encoding
     );
 
