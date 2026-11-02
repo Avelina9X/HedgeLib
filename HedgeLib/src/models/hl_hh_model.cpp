@@ -1051,6 +1051,24 @@ void raw_skeletal_model_v2::fix()
 #endif
 }
 
+void raw_skeletal_model_v4::fix()
+{
+#ifndef HL_IS_BIG_ENDIAN
+    endian_swap<false>();
+    in_swap_recursive(meshGroups);
+    in_swap_recursive(unknown1);
+    in_swap_recursive(unknown2);
+
+    for (u32 i = 0; i < nodeCount; ++i)
+    {
+        nodes[i]->endian_swap<false>();
+        nodeMatrices[i].endian_swap<false>();
+    }
+
+    bounds->endian_swap<false>();
+#endif
+}
+
 void raw_skeletal_model_v5::fix()
 {
 #ifndef HL_IS_BIG_ENDIAN
@@ -2651,7 +2669,13 @@ void skeletal_model::in_parse(const raw_skeletal_model_v2& rawMdl)
 
 void skeletal_model::in_parse(const raw_skeletal_model_v4& rawMdl)
 {
-    // TODO
+    meshGroups.emplace_back();
+    meshGroups.back().opaq = mesh_slot(rawMdl.meshGroups);
+    meshGroups.back().trans = mesh_slot(rawMdl.unknown1);
+    meshGroups.back().punch = mesh_slot(rawMdl.unknown2);
+
+    for (u32 i = 0; i < rawMdl.nodeCount; ++i)
+        nodes.emplace_back(*rawMdl.nodes[i].get(), rawMdl.nodeMatrices[i]);
 }
 
 void skeletal_model::in_parse(const raw_skeletal_model_v5& rawMdl)
@@ -2707,6 +2731,9 @@ void skeletal_model::in_parse(const void* rawData)
         break;
 
     // TODO: V4 support.
+    case 4:
+        in_parse(*static_cast<const raw_skeletal_model_v4*>(mdlData));
+        break;
 
     case 5:
         in_parse(*static_cast<const raw_skeletal_model_v5*>(mdlData));
@@ -2757,6 +2784,10 @@ void skeletal_model::fix(void* rawData)
         break;
 
     // TODO: V4 support.
+
+    case 4:
+        static_cast<raw_skeletal_model_v4*>(mdlData)->fix();
+        break;
         
     case 5:
         static_cast<raw_skeletal_model_v5*>(mdlData)->fix();

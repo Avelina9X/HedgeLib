@@ -545,10 +545,14 @@ HL_STATIC_ASSERT_SIZE(raw_skeletal_model_v2, 0x2C);
 
 struct raw_skeletal_model_v4
 {
-    arr32<off32<raw_mesh_group_r1>> meshGroups;
-    arr32<void> unknown1; // TODO
-    arr32<void> unknown2; // TODO
-    arr32<void> unknown3; // TODO
+    //arr32<off32<raw_mesh_group_r1>> meshGroups;
+    //arr32<void> unknown1; // TODO
+    //arr32<void> unknown2; // TODO
+    //arr32<void> unknown3; // TODO
+    raw_mesh_slot_r1 meshGroups;
+    raw_mesh_slot_r1 unknown1;
+    raw_mesh_slot_r1 unknown2;
+    arr32<void> unknown3;
     u32 nodeCount;
     off32<off32<raw_node>> nodes;
     off32<matrix4x4> nodeMatrices;
@@ -557,6 +561,10 @@ struct raw_skeletal_model_v4
     template<bool swapOffsets = true>
     void endian_swap() noexcept
     {
+        /*hl::endian_swap<swapOffsets>(meshGroups);
+        hl::endian_swap<swapOffsets>(unknown1);
+        hl::endian_swap<swapOffsets>(unknown2);
+        hl::endian_swap<swapOffsets>(unknown3);*/
         hl::endian_swap<swapOffsets>(meshGroups);
         hl::endian_swap<swapOffsets>(unknown1);
         hl::endian_swap<swapOffsets>(unknown2);
@@ -568,9 +576,10 @@ struct raw_skeletal_model_v4
     }
 
     // TODO: Fix function.
+    void fix();
 };
 
-HL_STATIC_ASSERT_SIZE(raw_skeletal_model_v4, 0x30);
+//HL_STATIC_ASSERT_SIZE(raw_skeletal_model_v4, 0x30);
 
 struct raw_skeletal_model_v5
 {
